@@ -1,0 +1,1 @@
+Proyecto para manejo de socios, se actualizará la bd cuando un socio pague su cuota,  de baja o alta. El administrador verá todos los socios con el estado de su cuota 
