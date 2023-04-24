@@ -1,8 +1,9 @@
 const Router = require('express');
 const socio = Router();
-const {getSocio} = require("../controllers/socioController");
+const {getAllSocio,getSocioId} = require("../controllers/socioController");
 
-socio.get("/", getSocio);
+socio.get("/", getAllSocio);
+socio.get('/:idSocio', getSocioId)
 
 
 module.exports = socio;
