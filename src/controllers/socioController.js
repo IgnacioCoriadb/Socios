@@ -72,5 +72,9 @@ const updateSocio = async (req, res) => {
 
 
 
+//?obtener socios con cuotas al dia (son los que estan en status true)
+//?obtener socio por nombre, apellido o numero de socio (query)
+//?obtener los pagos del mes actual o de un determinado mes 
+//?buscar por edad, sexo, si hace o no disiplina en el club (campos a agregar en la bd )
 
 module.exports ={getAllSocio,getSocioId,postSocio,updateSocio}
