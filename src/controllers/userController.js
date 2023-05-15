@@ -1,33 +1,33 @@
-const {Socio} = require('../../database');
+const {User} = require('../../database');
 
-//?---------------------------------ALLSOCIO---------------------------------------------------
-const getAllSocio=async (req, res)=>{
+//?---------------------------------ALLUser---------------------------------------------------
+const getAllUser=async (req, res)=>{
     try{
-        const socios = await Socio.findAll();
-        res.json(socios);
+        const Users = await User.findAll();
+        res.json(Users);
     }catch(error){
         const errorMessage = '"An error occurred while connecting to the database." ' + error.message;
         res.status(500).json({ error: errorMessage });
     }
 }
 
-//?--------------------------------getSocioId---------------------------------------------------------  
-const getSocioId = async (req, res)=>{
-    const {idSocio} = req.params;
+//?--------------------------------getUserId---------------------------------------------------------  
+const getUserId = async (req, res)=>{
+    const {idUser} = req.params;
     try{
-        const socio = await Socio.findByPk(idSocio)
-        res.json(socio)
+        const user = await User.findByPk(idUser)
+        res.json(user)
     }catch(error){
-        const errorMessage = "No exist member with id number " + idSocio;
+        const errorMessage = "No exist member with id number " + idUser;
         res.status(500).json({ error: errorMessage });
     }
 }
 
 //?-------------------------------CreateSocio----------------------------------------------------------- 
-const postSocio =async (req, res)=>{
+const postUser =async (req, res)=>{
     const {name,lastName, birthdate,status, lastpayment,membershipNumber} = req.body;
     try{
-        await Socio.create({
+        await User.create({
             name: name,
             lastName: lastName,
             birthdate: birthdate,
@@ -44,11 +44,11 @@ const postSocio =async (req, res)=>{
 }
 
 //?---------------------------------UpdateSocio-----------------------------------------------------------
-const updateSocio = async (req, res) => {
+const updateUser = async (req, res) => {
     const {name,lastName, birthdate,status, lastpayment,membershipNumber} = req.body;
-    const {idSocio} = req.params;
+    const {idUser} = req.params;
     try{
-        Socio.update(
+        User.update(
             {
                 name: name,
                 lastName: lastName,
@@ -58,7 +58,7 @@ const updateSocio = async (req, res) => {
                 membershipNumber: membershipNumber
             }, {
             where: {
-                id: idSocio
+                id: idUser
             }
         })
 
@@ -77,4 +77,4 @@ const updateSocio = async (req, res) => {
 //?obtener los pagos del mes actual o de un determinado mes 
 //?buscar por edad, sexo, si hace o no disiplina en el club (campos a agregar en la bd )
 
-module.exports ={getAllSocio,getSocioId,postSocio,updateSocio}
+module.exports ={getAllUser,getUserId,postUser,updateUser}
