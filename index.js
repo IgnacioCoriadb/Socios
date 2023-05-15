@@ -8,4 +8,3 @@ conn.sync({ force: false }).then(() => {
       console.log(`%s listening at http://localhost:${port}`);
     })
   });
-  

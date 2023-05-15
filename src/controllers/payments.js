@@ -1,15 +1,9 @@
-//?1)generar un boton de pago
-//?2)generar un boton de suscripciones
-//?3)actualizar bd con usuarios pagadores
-//?     a)si es suscripcion actualizar la lastPayment con la fecha de pago 
-//?     b) si paga por medio de boton fijarse cual es el ultimo mes pago y actualizar a el siguiente mes 
-
 const axios = require('axios');
 const mercadopago = require('mercadopago');
-const {Socio} = require('../../database');
+const {User} = require('../../database');
 
 
-User1 = {
+const User1 = {
   id: '5c5a2d5c-6265-4a5d-ae4e-38c4c7d652da'
 }
 
@@ -53,6 +47,7 @@ const response =async (req,res)=>{
     responesSubscription(req, res);
   }
 }
+
 
 const subscription =async (req,res)=>{
 
@@ -112,9 +107,9 @@ const responesSubscription = async (req, res) => {
 }
 
 const updateDbSocios =async (paymentDate,idUser)=>{
-  const paymentLastMonth = await Socio.findByPk(idUser,{ attributes: ['month', 'year']});
+  const paymentLastMonth = await User.findByPk(idUser,{ attributes: ['month', 'year']});
   //update db lastpayment
-  await Socio.update(
+  await User.update(
     {
       lastPayment: paymentDate
     },
@@ -127,7 +122,7 @@ const updateDbSocios =async (paymentDate,idUser)=>{
   //le sumo uno a el ultimo mes pago si son mas de doce meses vuelve a uno y cambia el año 
   if(paymentLastMonth.month < 12){
     const newMonth  =paymentLastMonth.month +1;
-    await Socio.update(
+    await User.update(
       {
         month:newMonth
       },
@@ -139,7 +134,7 @@ const updateDbSocios =async (paymentDate,idUser)=>{
     )
   }else{
     const newYear = paymentLastMonth.year +1;
-    await Socio.update(
+    await User.update(
       {
         month: 1,
         year: newYear
@@ -160,7 +155,7 @@ const updateDbSocios =async (paymentDate,idUser)=>{
   //si coinicide el socio está al día
   if(paymentLastMonthUpdated.month >=  currentMonth && paymentLastMonthUpdated.year >= currentYear){
     console.log(`Cuota al día, tiene pago hasta el mes ${paymentLastMonthUpdated.month} del ${paymentLastMonthUpdated.year}`)
-    await Socio.update(
+    await User.update(
       {
         status: true
       },
@@ -171,7 +166,7 @@ const updateDbSocios =async (paymentDate,idUser)=>{
       }
     )
   }else{
-    await Socio.update(
+    await User.update(
       {
         status: false
       },
