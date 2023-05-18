@@ -34,12 +34,14 @@ const getUserId = async (req, res)=>{
 
 //?-------------------------------CreateSocio----------------------------------------------------------- 
 const postUser =async (req, res)=>{
-    const {name,lastName, birthdate,email,membershipNumber,status} = req.body;
+    const {name,lastName, birthdate,email,membershipNumber,status, month,year} = req.body;
     try{
          //CREAR UN USESTATE
        const stateUser=  await StateUser.create({
             membershipNumber: membershipNumber,
-            status: status
+            status: status,
+            month: month,
+            year: year
         })
 
         await User.create({
