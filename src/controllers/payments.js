@@ -1,10 +1,11 @@
 const axios = require('axios');
 const mercadopago = require('mercadopago');
-const {User} = require('../../database');
+const {User,StateUser} = require('../../database');
+const moment = require('moment-timezone');
 
 
 const User1 = {
-  id: '5c5a2d5c-6265-4a5d-ae4e-38c4c7d652da'
+  id: 'e16c6b19-1fb4-4f6d-bce0-85dbd0d3e00a'
 }
 
 //?1)generar un boton de pago
@@ -14,11 +15,11 @@ const buttonPayment = (req, res) => {
         items: [
             {
                 title: 'Pago de Cuota',
-                unit_price: 123,
+                unit_price: 100,
                 quantity: 1,
             }
         ],
-       
+
         // notification_url: "https://b96d-190-18-180-176.ngrok-free.app/response"
     }
     mercadopago.preferences
@@ -51,23 +52,27 @@ const response =async (req,res)=>{
 
 const subscription =async (req,res)=>{
 
+//   const currentDate = moment().tz('America/Argentina/Buenos_Aires');
+// const tomorrowDate = currentDate.clone().add(1, 'day');
+// const startDate = currentDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+// console.log('Fecha de inicio formateada:', startDate);
+
+
   const subscriptionData = {
     reason: "Colaboración mensual",
     payer_email: 'test_user_1302851605@testuser.com',
     external_reference:User1.id,
     auto_recurring: {
       frequency: 1,
-      frequency_type: 'months',
-      transaction_amount: 22,
-      currency_id: 'ARS',
-      // start_date: new Date(),
-      // end_date: new Date().setFullYear(new Date().getFullYear() + 1)
+    frequency_type: 'days',
+    transaction_amount: 505,
+    currency_id: "ARS",
     },
     back_url: 'https://www.tu-sitio.com/feedback',
-
+    auto_return: "approved",
 
   };
-  
+
     const result = await mercadopago.preapproval.create(subscriptionData);
     res.json({id:result.body.id, link: result.body.init_point})
 
@@ -75,7 +80,7 @@ const subscription =async (req,res)=>{
 
 const responsePayment = async(req, res)=>{
   const payment = await mercadopago.payment.findById(req.body.data.id);//id del pagador
-  const merchanOrder = await mercadopago.merchant_orders.findById(payment.body.order.id); //pago 
+  const merchanOrder = await mercadopago.merchant_orders.findById(payment.body.order.id); //pago
   const idUser =payment.body.metadata.id_user; //id de user pagador
   const paymentLastDateHs = merchanOrder.response.last_updated; //fecha mas hora
   const paymentDate = paymentLastDateHs.slice(0,10); //fecha sin hora
@@ -84,11 +89,11 @@ const responsePayment = async(req, res)=>{
     if(payment.status === 'approved' && payment.status_detail ==='accredited'){
       console.log('Pago exitoso');
       updateDbSocios(paymentDate,idUser)
-      
+
     }else{
         console.log('No se pudo realizar el pago ')
     }
-  });  
+  });
 
   res.status(200).json("OK")
 }
@@ -96,20 +101,21 @@ const responsePayment = async(req, res)=>{
 const responesSubscription = async (req, res) => {
   const payment= await  mercadopago.preapproval.findById(req.body.data.id, response=> response);
   const idUser = payment.body.external_reference;
+ 
     if(payment.response.status === 'authorized'){
-      const paymentLastDateHs = payment.response.last_modified; //fecha y hora del pago 
+      const paymentLastDateHs = payment.response.last_modified; //fecha y hora del pago
       const paymentDate = paymentLastDateHs.slice(0,10); //fecha sin hora
       updateDbSocios(paymentDate,idUser)
     }else{
-      console.log('Pending')
+      console.log(payment.response.status)
     }
     res.status(200).json("OK")
 }
 
 const updateDbSocios =async (paymentDate,idUser)=>{
-  const paymentLastMonth = await User.findByPk(idUser,{ attributes: ['month', 'year']});
+  const paymentLastMonth = await StateUser.findByPk(idUser,{ attributes: ['month', 'year']});
   //update db lastpayment
-  await User.update(
+  await StateUser.update(
     {
       lastPayment: paymentDate
     },
@@ -119,10 +125,10 @@ const updateDbSocios =async (paymentDate,idUser)=>{
       }
     }
   );
-  //le sumo uno a el ultimo mes pago si son mas de doce meses vuelve a uno y cambia el año 
+  //le sumo uno a el ultimo mes pago si son mas de doce meses vuelve a uno y cambia el año
   if(paymentLastMonth.month < 12){
     const newMonth  =paymentLastMonth.month +1;
-    await User.update(
+    await StateUser.update(
       {
         month:newMonth
       },
@@ -134,7 +140,7 @@ const updateDbSocios =async (paymentDate,idUser)=>{
     )
   }else{
     const newYear = paymentLastMonth.year +1;
-    await User.update(
+    await StateUser.update(
       {
         month: 1,
         year: newYear
@@ -150,12 +156,12 @@ const updateDbSocios =async (paymentDate,idUser)=>{
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1; // suma uno porque toma de 0 a 11
   const currentYear = currentDate.getFullYear();
-  //vuelvo a consultar día y fecha despues de actualizar 
-  const paymentLastMonthUpdated = await Socio.findByPk(idUser,{ attributes: ['month', 'year']});
+  //vuelvo a consultar día y fecha despues de actualizar
+  const paymentLastMonthUpdated = await StateUser.findByPk(idUser,{ attributes: ['month', 'year']});
   //si coinicide el socio está al día
   if(paymentLastMonthUpdated.month >=  currentMonth && paymentLastMonthUpdated.year >= currentYear){
     console.log(`Cuota al día, tiene pago hasta el mes ${paymentLastMonthUpdated.month} del ${paymentLastMonthUpdated.year}`)
-    await User.update(
+    await StateUser.update(
       {
         status: true
       },
@@ -166,7 +172,7 @@ const updateDbSocios =async (paymentDate,idUser)=>{
       }
     )
   }else{
-    await User.update(
+    await StateUser.update(
       {
         status: false
       },
