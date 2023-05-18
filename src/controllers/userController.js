@@ -37,6 +37,7 @@ const postUser =async (req, res)=>{
     const {name,lastName, birthdate,email,membershipNumber,status, month,year} = req.body;
     try{
          //CREAR UN USESTATE
+         console.log(req.body)
        const stateUser=  await StateUser.create({
             membershipNumber: membershipNumber,
             status: status,
