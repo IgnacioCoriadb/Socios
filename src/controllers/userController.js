@@ -1,4 +1,4 @@
-const {User} = require('../../database');
+const {User,StateUser} = require('../../database');
 
 //?---------------------------------ALLUser---------------------------------------------------
 const getAllUser=async (req, res)=>{
@@ -25,16 +25,23 @@ const getUserId = async (req, res)=>{
 
 //?-------------------------------CreateSocio----------------------------------------------------------- 
 const postUser =async (req, res)=>{
-    const {name,lastName, birthdate,status, lastpayment,membershipNumber} = req.body;
+    const {name,lastName, birthdate,email,membershipNumber,status} = req.body;
     try{
         await User.create({
             name: name,
             lastName: lastName,
             birthdate: birthdate,
-            status: status,
-            lastpayment: lastpayment,
-            membershipNumber: membershipNumber
+            email: email
         })
+
+        //CREAR UN USESTATE
+        await StateUser.create({
+            membershipNumber: membershipNumber,
+            status: status
+        })
+
+
+
 
         res.json("User created successfully");
     }catch(error){
