@@ -183,6 +183,7 @@ const updateDbSocios =async (paymentDate,idUser)=>{
       }
     )
     console.log(`El ultimo mes pago es ${paymentLastMonth.month}/${paymentLastMonth.year}`)
+
   }
 }
 

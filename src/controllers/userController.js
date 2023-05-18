@@ -3,7 +3,16 @@ const {User,StateUser} = require('../../database');
 //?---------------------------------ALLUser---------------------------------------------------
 const getAllUser=async (req, res)=>{
     try{
-        const Users = await User.findAll();
+        const Users = await StateUser.findAll({
+            include:[
+                {
+                  model: User,
+                  attributes: ['name','lastName', 'birthdate','email']
+                },
+              ],
+              attributes: ['membershipNumber','status','month','year','lastPayment'],
+
+        });
         res.json(Users);
     }catch(error){
         const errorMessage = '"An error occurred while connecting to the database." ' + error.message;
