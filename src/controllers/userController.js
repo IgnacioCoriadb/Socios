@@ -27,19 +27,21 @@ const getUserId = async (req, res)=>{
 const postUser =async (req, res)=>{
     const {name,lastName, birthdate,email,membershipNumber,status} = req.body;
     try{
-        await User.create({
-            name: name,
-            lastName: lastName,
-            birthdate: birthdate,
-            email: email
-        })
-
-        //CREAR UN USESTATE
-        await StateUser.create({
+         //CREAR UN USESTATE
+       const stateUser=  await StateUser.create({
             membershipNumber: membershipNumber,
             status: status
         })
 
+        await User.create({
+            name: name,
+            lastName: lastName,
+            birthdate: birthdate,
+            email: email,
+            StateUserId: stateUser.id
+        })
+
+       
 
 
 
