@@ -5,13 +5,13 @@ const moment = require('moment-timezone');
 
 
 const User1 = {
-  id: 'e16c6b19-1fb4-4f6d-bce0-85dbd0d3e00a'
+  id: 'bc543474-b237-4acb-a48a-b7b94af68148'
 }
 
 //?1)generar un boton de pago
 const buttonPayment = (req, res) => {
     let preference = {
-      metadata: {idUser:User1.id },
+      metadata: {idUser:req.body.id},
         items: [
             {
                 title: 'Pago de Cuota',
@@ -65,7 +65,7 @@ const subscription =async (req,res)=>{
     auto_recurring: {
       frequency: 1,
     frequency_type: 'days',
-    transaction_amount: 505,
+    transaction_amount: 1030,
     currency_id: "ARS",
     },
     back_url: 'https://www.tu-sitio.com/feedback',
