@@ -4,10 +4,6 @@ const {User,StateUser} = require('../../database');
 const moment = require('moment-timezone');
 
 
-const User1 = {
-  id: 'bc543474-b237-4acb-a48a-b7b94af68148'
-}
-
 //?1)generar un boton de pago
 const buttonPayment = (req, res) => {
     let preference = {
@@ -61,7 +57,7 @@ const subscription =async (req,res)=>{
   const subscriptionData = {
     reason: "Colaboración mensual",
     payer_email: 'test_user_1302851605@testuser.com',
-    external_reference:User1.id,
+    external_reference:req.body.id,
     auto_recurring: {
       frequency: 1,
     frequency_type: 'days',
